@@ -1,13 +1,13 @@
 export function getData(): any[] {
   var rowData = [
     {
-      controlNumber: ["T00001."],
+      controlNumber: "T00001.",
       商材名: "リグロEX5.",
       ジャンル: "育毛剤.",
       再生回数: "5000",
     },
     {
-      controlNumber: ["T00002."],
+      controlNumber: "T00002.",
       商材名: "キャリエル転職系",
       ジャンル: "転職系",
       再生回数: "10000",
@@ -25,7 +25,7 @@ export function getData(): any[] {
       再生回数: "10000",
     },
     {
-      controlNumber: ["T00003."],
+      controlNumber: "T00003.",
       商材名: "アプリフェミークリニック. ",
       ジャンル: "美容皮膚科.",
       再生回数: "3000",

@@ -41,9 +41,14 @@ const TreeData = () => {
       },
     };
   }, []);
+
   const getDataPath = useMemo<GetDataPath>(() => {
     return (data: any) => {
-      return data.controlNumber;
+      if (Array.isArray(data.controlNumber)) {
+        return data.controlNumber;
+      } else {
+        return [data.controlNumber];
+      }
     };
   }, []);
 
