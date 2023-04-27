@@ -4,13 +4,7 @@ import { AgGridReact } from "ag-grid-react";
 import "ag-grid-enterprise";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
-import {
-  ColDef,
-  ColGroupDef,
-  GetDataPath,
-  Grid,
-  GridOptions,
-} from "ag-grid-community";
+import { ColDef, GetDataPath, PaginationChangedEvent } from "ag-grid-community";
 import { getData } from "./data";
 
 const TreeData = () => {
@@ -21,6 +15,8 @@ const TreeData = () => {
   );
   const gridStyle = useMemo(() => ({ height: "100%", width: "100%" }), []);
   const [rowData, setRowData] = useState<any[]>(getData());
+  // const [rowData, setRowData] = useState<any[]>(null);
+
   const [columnDefs, setColumnDefs] = useState<ColDef[]>([
     // we're using the auto group column by default!
     { field: "商材名" },
@@ -58,6 +54,14 @@ const TreeData = () => {
     );
   }, []);
 
+  const onPageChanged = useCallback(async (event: PaginationChangedEvent) => {
+    if (event.newPage) {
+      // fetch data for the new page
+      const newData = await getData(event.newPage); // update the getData function to handle pagination
+      setRowData(newData);
+    }
+  }, []);
+
   return (
     <div style={containerStyle}>
       <div className="example-wrapper">
@@ -81,6 +85,10 @@ const TreeData = () => {
             animateRows={true}
             groupDefaultExpanded={-1}
             getDataPath={getDataPath}
+            pagination={true}
+            paginationPageSize={10} // adjust as needed
+            onPaginationChanged={onPageChanged}
+            onGridReady={(event) => event.api.paginationGoToPage(0)}
           ></AgGridReact>
         </div>
       </div>
