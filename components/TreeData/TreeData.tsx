@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { render } from "react-dom";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-enterprise";
@@ -85,8 +85,17 @@ const TreeData = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const fetchRowData = async () => {
+      const result = await getData(0, 20);
+      setRowData(result.data);
+    };
+
+    fetchRowData();
+  }, []);
+
   const gridOptions: GridOptions = {
-    rowModelType: "serverSide",
+    rowModelType: "clientSide",
     cacheBlockSize: 20,
     columnDefs: columnDefs,
     defaultColDef: defaultColDef,
