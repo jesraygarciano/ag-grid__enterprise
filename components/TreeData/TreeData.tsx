@@ -22,6 +22,7 @@ const TreeData = () => {
   );
   const gridStyle = useMemo(() => ({ height: "100%", width: "100%" }), []);
   const [rowData, setRowData] = useState<any[]>(getData());
+  // const [rowData, setRowData] = useState<any[]>(null);
   const [columnDefs, setColumnDefs] = useState<ColDef[]>([
     // we're using the auto group column by default!
     { field: "商材名" },
@@ -85,6 +86,14 @@ const TreeData = () => {
     );
   }, []);
 
+  const onPageChanged = useCallback(async (event: PaginationChangedEvent) => {
+    if (event.newPage) {
+      // fetch data for the new page
+      const newData = await getData(event.newPage); // update the getData function to handle pagination
+      setRowData(newData);
+    }
+  }, []);
+
   return (
     <div style={containerStyle}>
       <div className="example-wrapper">
@@ -101,6 +110,13 @@ const TreeData = () => {
           <AgGridReact
             ref={gridRef}
             gridOptions={gridOptions}
+            columnDefs={columnDefs}
+            defaultColDef={defaultColDef}
+            autoGroupColumnDef={autoGroupColumnDef}
+            treeData={true}
+            animateRows={true}
+            groupDefaultExpanded={-1}
+            getDataPath={getDataPath}
             onGridReady={(event) => {
               event.api.setServerSideDatasource(serverSideDatasource);
             }}
