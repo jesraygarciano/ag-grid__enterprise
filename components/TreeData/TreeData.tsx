@@ -10,6 +10,7 @@ import {
   GetDataPath,
   Grid,
   GridOptions,
+  IServerSideDatasource,
 } from "ag-grid-community";
 import { getData } from "./data";
 
@@ -42,6 +43,20 @@ const TreeData = () => {
     };
   }, []);
 
+  const serverSideDatasource: IServerSideDatasource = {
+    getRows: async (params) => {
+      try {
+        // Fetch data from your API or a function that gets the data
+        const result = await getData(params.startRow, params.endRow);
+        // Provide the data to the grid
+        params.successCallback(result.data, result.lastRow);
+      } catch (error) {
+        // Handle errors if any
+        params.failCallback();
+      }
+    },
+  };
+
   const getDataPath = useMemo<GetDataPath>(() => {
     return (data: any) => {
       if (Array.isArray(data.controlNumber)) {
@@ -51,6 +66,18 @@ const TreeData = () => {
       }
     };
   }, []);
+
+  const gridOptions: GridOptions = {
+    rowModelType: "serverSide",
+    cacheBlockSize: 20,
+    columnDefs: columnDefs,
+    defaultColDef: defaultColDef,
+    autoGroupColumnDef: autoGroupColumnDef,
+    treeData: true,
+    animateRows: true,
+    groupDefaultExpanded: -1,
+    getDataPath: getDataPath,
+  };
 
   const onFilterTextBoxChanged = useCallback(() => {
     gridRef.current!.api.setQuickFilter(
@@ -73,14 +100,10 @@ const TreeData = () => {
         <div style={gridStyle} className="ag-theme-alpine">
           <AgGridReact
             ref={gridRef}
-            rowData={rowData}
-            columnDefs={columnDefs}
-            defaultColDef={defaultColDef}
-            autoGroupColumnDef={autoGroupColumnDef}
-            treeData={true}
-            animateRows={true}
-            groupDefaultExpanded={-1}
-            getDataPath={getDataPath}
+            gridOptions={gridOptions}
+            onGridReady={(event) => {
+              event.api.setServerSideDatasource(serverSideDatasource);
+            }}
           ></AgGridReact>
         </div>
       </div>

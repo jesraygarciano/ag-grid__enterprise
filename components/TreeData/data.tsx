@@ -1,4 +1,7 @@
-export function getData(): any[] {
+export async function getData(
+  startRow: number,
+  endRow: number
+): Promise<{ data: any[]; lastRow?: number }> {
   var rowData = [
     {
       controlNumber: "T00001.",
@@ -433,5 +436,13 @@ export function getData(): any[] {
       再生回数: "5000",
     },
   ];
-  return rowData;
+  const data = rowData.slice(startRow, endRow);
+
+  const lastRow = rowData.length;
+
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({ data: data, lastRow: lastRow });
+    }, 1000); // Simulate an API call with a delay
+  });
 }
