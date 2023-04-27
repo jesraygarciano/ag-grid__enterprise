@@ -87,7 +87,7 @@ const TreeData = () => {
 
   useEffect(() => {
     const fetchRowData = async () => {
-      const result = await getData(0, 20);
+      const result = await getData(0, 50);
       setRowData(result.data);
     };
 
