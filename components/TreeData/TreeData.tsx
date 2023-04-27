@@ -24,20 +24,7 @@ const TreeData = () => {
   const [rowData, setRowData] = useState<any[]>([]);
 
   const columnDefs = useMemo<ColDef[]>(() => {
-    return [
-      {
-        field: "controlNumber",
-        headerName: "管理番号",
-        minWidth: 300,
-        cellRenderer: "agGroupCellRenderer",
-        cellRendererParams: {
-          suppressCount: true,
-        },
-      },
-      { field: "商材名" },
-      { field: "ジャンル" },
-      { field: "再生回数" },
-    ];
+    return [{ field: "商材名" }, { field: "ジャンル" }, { field: "再生回数" }];
   }, []);
 
   const defaultColDef = useMemo<ColDef>(() => {

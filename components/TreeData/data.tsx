@@ -34,6 +34,12 @@ export async function getData(
       再生回数: "3000",
     },
     {
+      controlNumber: "T00004.",
+      商材名: "アプリフェミークリニック. ",
+      ジャンル: "美容皮膚科.",
+      再生回数: "3000",
+    },
+    {
       controlNumber: ["T00004.", "T00004-1."],
       商材名: "キャリエル転職系.",
       ジャンル: "転職系",
@@ -83,6 +89,12 @@ export async function getData(
     },
     {
       controlNumber: "T00011.",
+      商材名: "リグロEX5.",
+      ジャンル: "育毛剤.",
+      再生回数: "5000",
+    },
+    {
+      controlNumber: "T00012.",
       商材名: "リグロEX5.",
       ジャンル: "育毛剤.",
       再生回数: "5000",
@@ -149,6 +161,12 @@ export async function getData(
     },
     {
       controlNumber: "T00020.",
+      商材名: "リグロEX5.",
+      ジャンル: "育毛剤.",
+      再生回数: "5000",
+    },
+    {
+      controlNumber: "T00021.",
       商材名: "リグロEX5.",
       ジャンル: "育毛剤.",
       再生回数: "5000",
