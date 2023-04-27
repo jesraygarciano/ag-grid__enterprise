@@ -13,6 +13,10 @@ import {
 } from "ag-grid-community";
 import { getData } from "./data";
 
+// Manually register the ServerSideRowModelModule
+// import { ModuleRegistry } from "ag-grid-community";
+// ModuleRegistry.registerModules([ServerSideRowModelModule]);
+
 const TreeData = () => {
   const gridRef = useRef<AgGridReact>(null);
   const containerStyle = useMemo(
@@ -98,7 +102,6 @@ const TreeData = () => {
             groupDefaultExpanded={-1}
             getDataPath={getDataPath}
             onGridReady={onGridReady}
-            modules={[ServerSideRowModelModule]}
           ></AgGridReact>
         </div>
       </div>
