@@ -1,10 +1,16 @@
 import { useCallback, useMemo, useRef, useState } from "react";
-import { render } from "react-dom";
 import { AgGridReact } from "ag-grid-react";
+import { ServerSideRowModelModule } from "ag-grid-community";
 import "ag-grid-enterprise";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
-import { ColDef, GetDataPath, PaginationChangedEvent } from "ag-grid-community";
+import {
+  ColDef,
+  GetDataPath,
+  GridReadyEvent,
+  IServerSideDatasource,
+  IServerSideGetRowsParams,
+} from "ag-grid-community";
 import { getData } from "./data";
 
 const TreeData = () => {
@@ -14,20 +20,21 @@ const TreeData = () => {
     []
   );
   const gridStyle = useMemo(() => ({ height: "100%", width: "100%" }), []);
-  const [rowData, setRowData] = useState<any[]>(getData());
+  // const [rowData, setRowData] = useState<any[]>(getData());
   // const [rowData, setRowData] = useState<any[]>(null);
 
   const [columnDefs, setColumnDefs] = useState<ColDef[]>([
-    // we're using the auto group column by default!
     { field: "商材名" },
     { field: "ジャンル" },
     { field: "再生回数" },
   ]);
+
   const defaultColDef = useMemo<ColDef>(() => {
     return {
       flex: 1,
     };
   }, []);
+
   const autoGroupColumnDef = useMemo<ColDef>(() => {
     return {
       headerName: "管理番号",
@@ -54,12 +61,17 @@ const TreeData = () => {
     );
   }, []);
 
-  const onPageChanged = useCallback(async (event: PaginationChangedEvent) => {
-    if (event.newPage) {
-      // fetch data for the new page
-      const newData = await getData(event.newPage); // update the getData function to handle pagination
-      setRowData(newData);
-    }
+  const serverSideDatasource: IServerSideDatasource = {
+    getRows: (params: IServerSideGetRowsParams) => {
+      // Add logic to fetch data from the server as required
+      // For this example, we'll use the getData function
+      const data = getData();
+      params.api.setRowData(data);
+    },
+  };
+
+  const onGridReady = useCallback((event: GridReadyEvent) => {
+    event.api.setServerSideDatasource(serverSideDatasource);
   }, []);
 
   return (
@@ -77,7 +89,7 @@ const TreeData = () => {
         <div style={gridStyle} className="ag-theme-alpine">
           <AgGridReact
             ref={gridRef}
-            rowData={rowData}
+            // rowData={rowData}
             columnDefs={columnDefs}
             defaultColDef={defaultColDef}
             autoGroupColumnDef={autoGroupColumnDef}
@@ -85,10 +97,8 @@ const TreeData = () => {
             animateRows={true}
             groupDefaultExpanded={-1}
             getDataPath={getDataPath}
-            pagination={true}
-            paginationPageSize={10} // adjust as needed
-            onPaginationChanged={onPageChanged}
-            onGridReady={(event) => event.api.paginationGoToPage(0)}
+            onGridReady={onGridReady}
+            modules={[ServerSideRowModelModule]}
           ></AgGridReact>
         </div>
       </div>
