@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { render } from "react-dom";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-enterprise";
@@ -10,7 +10,6 @@ import {
   GetDataPath,
   Grid,
   GridOptions,
-  IServerSideDatasource,
 } from "ag-grid-community";
 import { getData } from "./data";
 
@@ -21,34 +20,20 @@ const TreeData = () => {
     []
   );
   const gridStyle = useMemo(() => ({ height: "100%", width: "100%" }), []);
-  const [rowData, setRowData] = useState<any[]>([]);
-
-  const columnDefs = useMemo<ColDef[]>(() => {
-    return [
-      {
-        field: "controlNumber",
-        headerName: "管理番号",
-        minWidth: 300,
-        cellRenderer: "agGroupCellRenderer",
-        cellRendererParams: {
-          suppressCount: true,
-        },
-      },
-      { field: "商材名" },
-      { field: "ジャンル" },
-      { field: "再生回数" },
-    ];
-  }, []);
-
+  const [rowData, setRowData] = useState<any[]>(getData());
+  const [columnDefs, setColumnDefs] = useState<ColDef[]>([
+    // we're using the auto group column by default!
+    { field: "商材名" },
+    { field: "ジャンル" },
+    { field: "再生回数" },
+  ]);
   const defaultColDef = useMemo<ColDef>(() => {
     return {
       flex: 1,
     };
   }, []);
-
   const autoGroupColumnDef = useMemo<ColDef>(() => {
     return {
-      field: "controlNumber",
       headerName: "管理番号",
       minWidth: 300,
       cellRendererParams: {
@@ -56,24 +41,6 @@ const TreeData = () => {
       },
     };
   }, []);
-
-  const serverSideDatasource: IServerSideDatasource = {
-    getRows: async (params) => {
-      try {
-        // Set default values for startRow and endRow
-        const startRow = params.request.startRow ?? 0;
-        const endRow = params.request.endRow ?? 20;
-
-        // Fetch data from your API or a function that gets the data
-        const result = await getData(startRow, endRow);
-        // Provide the data to the grid
-        params.success({ rowData: result.data, rowCount: result.lastRow });
-      } catch (error) {
-        // Handle errors if any
-        params.fail();
-      }
-    },
-  };
 
   const getDataPath = useMemo<GetDataPath>(() => {
     return (data: any) => {
@@ -84,27 +51,6 @@ const TreeData = () => {
       }
     };
   }, []);
-
-  useEffect(() => {
-    const fetchRowData = async () => {
-      const result = await getData(0, 20);
-      setRowData(result.data);
-    };
-
-    fetchRowData();
-  }, []);
-
-  const gridOptions: GridOptions = {
-    rowModelType: "clientSide",
-    cacheBlockSize: 20,
-    columnDefs: columnDefs,
-    defaultColDef: defaultColDef,
-    autoGroupColumnDef: autoGroupColumnDef,
-    treeData: true,
-    animateRows: true,
-    groupDefaultExpanded: -1,
-    getDataPath: getDataPath,
-  };
 
   const onFilterTextBoxChanged = useCallback(() => {
     gridRef.current!.api.setQuickFilter(
@@ -135,10 +81,6 @@ const TreeData = () => {
             animateRows={true}
             groupDefaultExpanded={-1}
             getDataPath={getDataPath}
-            gridOptions={gridOptions}
-            onGridReady={(event) => {
-              event.api.setServerSideDatasource(serverSideDatasource);
-            }}
           ></AgGridReact>
         </div>
       </div>
