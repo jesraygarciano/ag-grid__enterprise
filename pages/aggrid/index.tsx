@@ -10,13 +10,13 @@ export default function AgGrid() {
       <h1 className="text-xl mb-4">Tree Data</h1>
       <TreeData />
 
-      <h1 className="text-xl mb-4 mt-[5rem]">
+      {/* <h1 className="text-xl mb-4 mt-[5rem]">
         NOTION like AG Grid Row Grouping
       </h1>
       <GroupRows />
 
       <h1 className="text-xl mb-4 mt-[5rem]">AG Grid Row Grouping Example</h1>
-      <AgGridGrouping />
+      <AgGridGrouping /> */}
     </main>
   );
 }

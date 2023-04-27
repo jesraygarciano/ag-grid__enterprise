@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { render } from "react-dom";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-enterprise";
@@ -21,21 +21,34 @@ const TreeData = () => {
     []
   );
   const gridStyle = useMemo(() => ({ height: "100%", width: "100%" }), []);
-  const [rowData, setRowData] = useState<any[]>(getData());
-  // const [rowData, setRowData] = useState<any[]>(null);
-  const [columnDefs, setColumnDefs] = useState<ColDef[]>([
-    // we're using the auto group column by default!
-    { field: "商材名" },
-    { field: "ジャンル" },
-    { field: "再生回数" },
-  ]);
+  const [rowData, setRowData] = useState<any[]>([]);
+
+  const columnDefs = useMemo<ColDef[]>(() => {
+    return [
+      {
+        field: "controlNumber",
+        headerName: "管理番号",
+        minWidth: 300,
+        cellRenderer: "agGroupCellRenderer",
+        cellRendererParams: {
+          suppressCount: true,
+        },
+      },
+      { field: "商材名" },
+      { field: "ジャンル" },
+      { field: "再生回数" },
+    ];
+  }, []);
+
   const defaultColDef = useMemo<ColDef>(() => {
     return {
       flex: 1,
     };
   }, []);
+
   const autoGroupColumnDef = useMemo<ColDef>(() => {
     return {
+      field: "controlNumber",
       headerName: "管理番号",
       minWidth: 300,
       cellRendererParams: {
@@ -47,13 +60,17 @@ const TreeData = () => {
   const serverSideDatasource: IServerSideDatasource = {
     getRows: async (params) => {
       try {
+        // Set default values for startRow and endRow
+        const startRow = params.request.startRow ?? 0;
+        const endRow = params.request.endRow ?? 20;
+
         // Fetch data from your API or a function that gets the data
-        const result = await getData(params.startRow, params.endRow);
+        const result = await getData(startRow, endRow);
         // Provide the data to the grid
-        params.successCallback(result.data, result.lastRow);
+        params.success({ rowData: result.data, rowCount: result.lastRow });
       } catch (error) {
         // Handle errors if any
-        params.failCallback();
+        params.fail();
       }
     },
   };
@@ -68,8 +85,17 @@ const TreeData = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const fetchRowData = async () => {
+      const result = await getData(0, 20);
+      setRowData(result.data);
+    };
+
+    fetchRowData();
+  }, []);
+
   const gridOptions: GridOptions = {
-    rowModelType: "serverSide",
+    rowModelType: "clientSide",
     cacheBlockSize: 20,
     columnDefs: columnDefs,
     defaultColDef: defaultColDef,
@@ -84,14 +110,6 @@ const TreeData = () => {
     gridRef.current!.api.setQuickFilter(
       (document.getElementById("filter-text-box") as any).value
     );
-  }, []);
-
-  const onPageChanged = useCallback(async (event: PaginationChangedEvent) => {
-    if (event.newPage) {
-      // fetch data for the new page
-      const newData = await getData(event.newPage); // update the getData function to handle pagination
-      setRowData(newData);
-    }
   }, []);
 
   return (
@@ -109,7 +127,7 @@ const TreeData = () => {
         <div style={gridStyle} className="ag-theme-alpine">
           <AgGridReact
             ref={gridRef}
-            gridOptions={gridOptions}
+            rowData={rowData}
             columnDefs={columnDefs}
             defaultColDef={defaultColDef}
             autoGroupColumnDef={autoGroupColumnDef}
@@ -117,6 +135,7 @@ const TreeData = () => {
             animateRows={true}
             groupDefaultExpanded={-1}
             getDataPath={getDataPath}
+            gridOptions={gridOptions}
             onGridReady={(event) => {
               event.api.setServerSideDatasource(serverSideDatasource);
             }}
